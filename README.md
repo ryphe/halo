@@ -47,7 +47,6 @@
 | :--- | :--- |
 | **On-Screen Piano** | Click or slide to trigger notes; velocity from vertical position |
 | **Knobs** | Drag vertically to adjust; hold `Shift` for fine tuning |
-| **Master Dial** | Global output volume |
 | **Mouse Wheel** | Hover and scroll; `Shift` for finer steps |
 | **Preset Selector** | Dropdown for factory and user presets |
 | **Save Button** | Save current patch as `.halo.txt` |
