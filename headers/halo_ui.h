@@ -2041,6 +2041,7 @@ static void ui_play_audition(void) {
     audio_note_on(60, 0.85f);   /* C4 */
     audio_note_on(64, 0.75f);   /* E4 */
     audio_note_on(67, 0.70f);   /* G4 */
+    audio_schedule_audition_release(300); /* Guaranteed audio-thread release */
     SetTimer(g_ui.hwnd_main, 105, 300, NULL);
 }
 
@@ -2458,6 +2459,13 @@ static LRESULT CALLBACK HaloWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
                 audio_note_off(64);
                 audio_note_off(67);
             }
+            if (wParam == 107) {
+                KillTimer(hwnd, 107);
+                audio_all_notes_off();
+                memset(g_ui.keyboard_note_state, 0, sizeof(g_ui.keyboard_note_state));
+                g_ui.mouse_note = -1;
+                InvalidateRect(hwnd, NULL, FALSE);
+            }
             if (wParam == 106) {
                 ui_preview_tone_tick();
                 InvalidateRect(hwnd, NULL, FALSE);
@@ -2529,11 +2537,22 @@ static LRESULT CALLBACK HaloWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
             RECT rst_btn = {w - 102, 12, w - UI_MARGIN, 38};
             if (PtInRect(&rst_btn, (POINT){x, y})) {
                 g_ui.btn_flash_time[2] = GetTickCount();
+
+                /* Silence previous hung notes & clear keyboard state immediately */
+                audio_all_notes_off();
+                kb_release_all_notes();
+                memset(g_ui.keyboard_note_state, 0, sizeof(g_ui.keyboard_note_state));
+                g_ui.mouse_note = -1;
+
                 halo_get_preset(0, &g_current_patch);
                 snprintf(g_ui.preset_label, sizeof(g_ui.preset_label), "%s", HALO_PRESET_NAMES[0]);
                 g_ui.preset_sel = 0;
                 ui_init_knobs();
                 ui_play_audition();
+
+                /* Guaranteed 2-second voice purge */
+                audio_schedule_reset_clear(2000);
+                SetTimer(hwnd, 107, 2000, NULL);
                 return 0;
             }
 

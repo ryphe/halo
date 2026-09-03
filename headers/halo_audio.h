@@ -34,6 +34,9 @@ typedef struct {
     float            scope_ring[SCOPE_RING_SIZE];
     int              scope_write_idx;
     volatile float   level;      /* peak envelope of output, drives UI logo */
+
+    DWORD            reset_kill_tick;        /* tick when all voices must be killed */
+    DWORD            audition_release_tick;  /* tick when audition notes must release */
 } HaloAudio;
 
 static HaloAudio g_audio = {0};
@@ -83,6 +86,30 @@ static DWORD WINAPI audio_thread_proc(LPVOID param) {
                 waveOutUnprepareHeader(g_audio.hWaveOut, &g_audio.headers[i], sizeof(WAVEHDR));
 
                 EnterCriticalSection(&g_audio.cs);
+
+                DWORD now = GetTickCount();
+
+                /* Auto-release audition chord (300 ms) independent of UI timers */
+                if (g_audio.audition_release_tick && (long)(now - g_audio.audition_release_tick) >= 0) {
+                    g_audio.audition_release_tick = 0;
+                    for (int v = 0; v < HALO_MAX_VOICES; v++) {
+                        if (g_audio.vm.voices[v].active &&
+                            (g_audio.vm.voices[v].note == 60 ||
+                             g_audio.vm.voices[v].note == 64 ||
+                             g_audio.vm.voices[v].note == 67)) {
+                            voice_note_off(&g_audio.vm.voices[v]);
+                        }
+                    }
+                }
+
+                /* Clear all voices automatically 2 seconds after reset */
+                if (g_audio.reset_kill_tick && (long)(now - g_audio.reset_kill_tick) >= 0) {
+                    g_audio.reset_kill_tick = 0;
+                    for (int v = 0; v < HALO_MAX_VOICES; v++) {
+                        voice_force_idle(&g_audio.vm.voices[v]);
+                    }
+                }
+
                 halo_process_audio(&g_audio.vm, &g_audio.patch, mix_scratch, STREAM_BUF_SIZE);
                 LeaveCriticalSection(&g_audio.cs);
 
@@ -235,9 +262,23 @@ static void audio_note_off(int note) {
     LeaveCriticalSection(&g_audio.cs);
 }
 
+static void audio_schedule_reset_clear(DWORD delay_ms) {
+    EnterCriticalSection(&g_audio.cs);
+    g_audio.reset_kill_tick = GetTickCount() + delay_ms;
+    LeaveCriticalSection(&g_audio.cs);
+}
+
+static void audio_schedule_audition_release(DWORD delay_ms) {
+    EnterCriticalSection(&g_audio.cs);
+    g_audio.audition_release_tick = GetTickCount() + delay_ms;
+    LeaveCriticalSection(&g_audio.cs);
+}
+
 static void audio_all_notes_off(void) {
     if (!g_audio.initialized) return;
     EnterCriticalSection(&g_audio.cs);
+    g_audio.reset_kill_tick = 0;
+    g_audio.audition_release_tick = 0;
     for (int i = 0; i < HALO_MAX_VOICES; i++) {
         voice_force_idle(&g_audio.vm.voices[i]);
     }
