@@ -36,7 +36,7 @@
 | `Up / Down Arrow` | Shift musical typing octave |
 | `Space / Enter` | Play audition chord (C4–E4–G4) |
 | `K` | Open keybinds window |
-| `Ctrl + E` | Export current patch to WAV |
+| `Ctrl + E` | Export current voice to WAV (oneshot-style) |
 | `Escape` | Close popup / Exit |
 
 ---
