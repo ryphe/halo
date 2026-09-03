@@ -1,0 +1,7 @@
+// Halo synth embedded resources
+// The generated halo.ico is baked into halo.exe at build time so the
+// executable and its windows carry the icon without a runtime file load.
+
+#define HALO_ICON 1
+
+HALO_ICON ICON "halo.ico"
