@@ -1,7 +1,7 @@
 [Setup]
 AppId={{1DE84F42-BF10-4FC5-98C0-EEF88B0E4880}
 AppName=halo
-AppVersion=1.0
+AppVersion=1.1
 AppPublisher=ryphe
 DefaultDirName={autopf}\halo
 UsePreviousAppDir=no
@@ -11,7 +11,7 @@ UninstallDisplayIcon={app}\halo.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 OutputDir=.
-OutputBaseFilename=halo_setup_1.0
+OutputBaseFilename=halo_setup_1.1
 WizardStyle=modern
 ChangesAssociations=no
 DirExistsWarning=no
