@@ -5,7 +5,7 @@
 <h2 align="center">halo</h2>
 
 <p align="center">
-  8-voice hybrid additive/subtractive spectral synthesizer
+  8-voice hybrid additive/subtractive spectral synthesizer (C99/Win32)
 </p>
 
 ---
