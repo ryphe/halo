@@ -49,10 +49,11 @@
 | **Knobs** | Drag vertically to adjust; hold `Shift` for fine tuning |
 | **Mouse Wheel** | Hover and scroll; `Shift` for finer steps |
 | **Preset Selector** | Dropdown for factory and user presets |
-| **Save Button** | Save current patch as `.halo.txt` |
-| **Load Button** | Load a user preset from `.halo.txt` |
-| **Export Button** | Render 2.5-second polyphonic WAV |
-| **Reset Button** | Reset to default "Obsidian Pad" preset |
+| **Save** | Save current patch as `.halo.txt` |
+| **Load** | Load a user preset from `.halo.txt` |
+| **Export** | Render 2.5-second polyphonic WAV |
+| **Reset** | Reset to default "Obsidian Pad" preset |
+| **Keybinds** | Open keybinds window |
 | **Master Volume** | Global output level |
 
 ---
